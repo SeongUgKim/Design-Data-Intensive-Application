@@ -43,4 +43,34 @@
     CREATE INDEX edges_tails on edges (tail_vertex);
     CREATE INDEX edges_heads on edges (head_vertex);
     ```
-    
+- important aspects:
+    1. any vertex can have an edge connecting it with any other vertex
+    2. given any vertex, efficiently find both its incoming and its outgoing edges
+    3. can store several different kinds of information in a single graph 
+- flexibility for data modeling
+- good for evolvability => add features => a graph can easily be extended to accommodate changes
+
+## The Cypher Query Language
+- `Cypher`: declarative query language for property graphs
+- ex:
+```
+CREATE
+    (NAmerica:Location {name: 'North America', type: 'continent'}),
+    (USA:Location {name: 'United States', type: 'country'}),
+    (Idaho:Location {name:'Idaho', type:'state'}),
+    (Lucy:Person {name:'Lucy'}),
+    (Idaho) -[:WITHIN]-> (USA) -[:WITHIN]-> (NAmerica),
+    (Lucy) -[:BORN_IN]-> (Idaho)
+```
+- want to find the names of all the people who emigrated from the United States to Europe 
+- find all the vertices that have a `BORN_IN` edge to a location within the US 
+- also `LIVING_IN` edge to a location within Europe
+- return `name` property of each of those vertices
+```
+MATCH
+    (person) -[:BRON_IN]-> () -[:WITHIN*0..]-> (us:Location {name: 'United States'}),
+    (person) -[:LIVING_IN]-> () -[:WITHIN*0..]-> (eu:Location {name: 'Europe'})
+RETURN person.name
+```
+- don't need to specify execution details when writing a query
+    - query optimizer automatically chooses the strategy that is predicted to be the most efficient
